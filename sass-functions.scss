@@ -1,0 +1,103 @@
+
+/*
+	convert dashed string to camel-case string
+	For example: DashToCamelCase($string:'A-Dashed-string') returns aDashedString
+*/
+@function DashToCamelCase($string){
+	$newString:to-lower-case($string);
+	@while str-index($newString,'-') {
+		$dash : str-index($newString,'-');
+		$afterDash : str-slice($newString,($dash + 1), ($dash + 1));
+		$newString : Replace($source:$newString,$target:'-'+$afterDash,$replacement:to-upper-case($afterDash));
+	}
+	@return $newString;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+$alphabet:'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z';
+
+/*
+	convert camel-case string to dashed string. removes excess dashes
+	For example: DashToCamelCase($string:'aCamelCaseString') returns 'a-camel-case-string'
+
+	USAGE WARNING: this function can only detect word separation based on capitalization
+	For example: DashToCamelCase($string:'aCamelcasestring') will return 'a-camelcasestring', DashToCamelCase($string:'anACRONYMString') will return 'an-a-c-r-o-n-y-m-string'
+*/
+@function CamelCaseToDash($string){	
+	$newString:$string;
+	@each $letter in $alphabet {
+		@if str-index($string,$letter) {
+			$replace:to-lower-case("-#{$letter}");
+			$newString : Replace($source : $newString,$target : $letter,$replacement : $replace);
+		}
+	}
+	@return Replace($source : to-lower-case($newString), $target:'--',$replacement:'-');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	basic string replacement function. replaces all instances of $target in $source with $replacement 
+	For example: Replace($source:'replace-some-string',$target:'some',$replacement:'this') returns 'replace-this-string'
+*/
+@function Replace($source,$target,$replacement) {
+	$newStr : $source;
+	$index : str-index($newStr,$target);
+	@while $index {
+		$newStr : str-slice($newStr,1,($index - 1)) + $replacement + str-slice($newStr,$index+str-length($target));
+		$index : str-index($newStr,$target);
+	}
+	@return $newStr;
+}
+
+
+
+
+/* removes all instances of a specified character from a string */
+@function Strip($src,$tgt) {
+	@return Replace($source:$src,$target:$tgt,$replacement:'')
+}
+
+
+
+
+
+/* returns $count characters from the left of $source */
+@function Left($source,$count) {
+	@if $count>0 {
+		@return str-slice($source,1,$count);
+	} @else {
+		@return $source;
+	}
+}
+
+
+
+/* returns $count characters from the right of $source */
+@function Right($source,$count) {
+	@if $count>0 {
+		@return str-slice($source,(str-length($source) - $count)+1);
+	} @else {
+		@return $source;
+	}
+}
