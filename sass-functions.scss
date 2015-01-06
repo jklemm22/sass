@@ -8,7 +8,7 @@
 	@while str-index($newString,'-') {
 		$dash : str-index($newString,'-');
 		$afterDash : str-slice($newString,($dash + 1), ($dash + 1));
-		$newString : Replace($source:$newString,$target:'-'+$afterDash,$replacement:to-upper-case($afterDash));
+		$newString : ReplaceAll($source:$newString,$target:'-'+$afterDash,$replacement:to-upper-case($afterDash));
 	}
 	@return $newString;
 }
@@ -39,10 +39,10 @@ $alphabet:'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', '
 	@each $letter in $alphabet {
 		@if str-index($string,$letter) {
 			$replace:to-lower-case("-#{$letter}");
-			$newString : Replace($source : $newString,$target : $letter,$replacement : $replace);
+			$newString : ReplaceAll($source : $newString,$target : $letter,$replacement : $replace);
 		}
 	}
-	@return Replace($source : to-lower-case($newString), $target:'--',$replacement:'-');
+	@return ReplaceAll($source : to-lower-case($newString), $target:'--',$replacement:'-');
 }
 
 
@@ -58,14 +58,12 @@ $alphabet:'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', '
 
 /*
 	basic string replacement function. replaces all instances of $target in $source with $replacement 
-	For example: Replace($source:'replace-some-string',$target:'some',$replacement:'this') returns 'replace-this-string'
+	For example: ReplaceAll($source:'replace-some-some-string',$target:'some',$replacement:'this') returns 'replace-this-this-string'
 */
-@function Replace($source,$target,$replacement) {
+@function ReplaceAll($source,$target,$replacement) {
 	$newStr : $source;
-	$index : str-index($newStr,$target);
-	@while $index {
-		$newStr : str-slice($newStr,1,($index - 1)) + $replacement + str-slice($newStr,$index+str-length($target));
-		$index : str-index($newStr,$target);
+	@while str-index($newStr,$target) {
+		$newStr : Replace($src:$newStr,$tgt:$target,$rep:$replacement);
 	}
 	@return $newStr;
 }
@@ -73,9 +71,27 @@ $alphabet:'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', '
 
 
 
+
+
+
+/*
+	basic string replacement function. replaces first instance of $target in $source with $replacement 
+	For example: Replace($src:'replace-some-string-this',$tgt:'some',$rep:'this') returns 'replace-this-string-some'
+*/
+@function Replace($src,$tgt,$rep) {
+	$index:str-index($src,$tgt);
+	@return str-slice($src,1,($index - 1)) + $rep + str-slice($src,$index+str-length($tgt));
+}
+
+
+
+
+
+
+
 /* removes all instances of a specified character from a string */
 @function Strip($src,$tgt) {
-	@return Replace($source:$src,$target:$tgt,$replacement:'')
+	@return ReplaceAll($source:$src,$target:$tgt,$replacement:'')
 }
 
 
